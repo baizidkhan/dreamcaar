@@ -7,6 +7,7 @@ import { CompareSection } from "@/components/CompareSection";
 import { EMICalculator } from "@/components/EMICalculator";
 import { TrustBadges } from "@/components/TrustBadges";
 import { SellCarCTA } from "@/components/SellCarCTA";
+import { NewsSection } from "@/components/NewsSection";
 import { Testimonials } from "@/components/Testimonials";
 import { Footer } from "@/components/Footer";
 
@@ -22,6 +23,7 @@ const Index = () => {
       <EMICalculator />
       <TrustBadges />
       <SellCarCTA />
+      <NewsSection />
       <Testimonials />
       <Footer />
     </div>
