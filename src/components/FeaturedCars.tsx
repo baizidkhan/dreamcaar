@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Heart, MapPin, Fuel, Gauge, Calendar, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
+import { carsData } from "@/data/carsData";
 const featuredCars = [
   {
     id: 1,
@@ -88,7 +89,7 @@ const featuredCars = [
     verified: true,
     featured: true,
   },
-];
+const featuredCars = carsData.filter(car => car.featured).slice(0, 6);
 
 export const FeaturedCars = () => {
   return (

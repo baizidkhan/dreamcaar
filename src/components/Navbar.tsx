@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Menu, X, Car, User, Heart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
-  { label: "Buy Cars", href: "#" },
-  { label: "Sell Car", href: "#" },
-  { label: "Compare", href: "#" },
-  { label: "EMI Calculator", href: "#" },
+  { label: "Buy Cars", href: "/cars" },
+  { label: "Sell Car", href: "/cars" },
+  { label: "Compare", href: "/#compare" },
+  { label: "EMI Calculator", href: "/#emi" },
   { label: "News", href: "#" },
 ];
 
@@ -22,25 +23,25 @@ export const Navbar = () => {
     >
       <div className="container flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
             <Car className="w-6 h-6 text-primary-foreground" />
           </div>
           <span className="text-xl font-bold font-heading">
             Car<span className="text-primary">Vault</span>
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
+              to={link.href}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -56,8 +57,9 @@ export const Navbar = () => {
             <User className="w-4 h-4" />
             Login
           </Button>
-          <Button size="sm">Post Your Car</Button>
-        </div>
+          <Link to="/cars">
+            <Button size="sm">Post Your Car</Button>
+          </Link>
 
         {/* Mobile Menu Button */}
         <button
