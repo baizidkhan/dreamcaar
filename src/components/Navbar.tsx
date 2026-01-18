@@ -60,6 +60,7 @@ export const Navbar = () => {
           <Link to="/cars">
             <Button size="sm">Post Your Car</Button>
           </Link>
+        </div>
 
         {/* Mobile Menu Button */}
         <button
@@ -80,20 +81,23 @@ export const Navbar = () => {
         >
           <div className="container py-4 space-y-4">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
+                to={link.href}
                 className="block py-2 text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setIsOpen(false)}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="pt-4 border-t border-border space-y-3">
               <Button variant="outline" className="w-full gap-2">
                 <User className="w-4 h-4" />
                 Login
               </Button>
-              <Button className="w-full">Post Your Car</Button>
+              <Link to="/cars" onClick={() => setIsOpen(false)}>
+                <Button className="w-full">Post Your Car</Button>
+              </Link>
             </div>
           </div>
         </motion.div>
