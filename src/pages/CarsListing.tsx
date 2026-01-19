@@ -21,18 +21,31 @@ const CarsListing = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("featured");
   
-  // Filter states
+  // Get URL params
+  const urlBrand = searchParams.get("brand");
+  const urlBodyType = searchParams.get("bodyType");
+  const urlType = searchParams.get("type"); // "new" or "used"
+  const urlMinPrice = searchParams.get("minPrice");
+  const urlMaxPrice = searchParams.get("maxPrice");
+  
+  // Filter states - initialize from URL params
   const [selectedBrands, setSelectedBrands] = useState<string[]>(
-    searchParams.get("brand") ? [searchParams.get("brand")!] : []
+    urlBrand ? [urlBrand] : []
   );
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>(
-    searchParams.get("bodyType") ? [searchParams.get("bodyType")!] : []
+    urlBodyType ? [urlBodyType] : []
   );
   const [selectedFuelTypes, setSelectedFuelTypes] = useState<string[]>([]);
   const [selectedTransmission, setSelectedTransmission] = useState<string[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([
+    urlMinPrice ? parseInt(urlMinPrice) : 0,
+    urlMaxPrice ? parseInt(urlMaxPrice) : 100000
+  ]);
   const [yearRange, setYearRange] = useState([2018, 2024]);
+  const [carType, setCarType] = useState<"all" | "new" | "used">(
+    urlType === "new" || urlType === "used" ? urlType : "all"
+  );
 
   const toggleFilter = (value: string, selected: string[], setSelected: (val: string[]) => void) => {
     if (selected.includes(value)) {
@@ -51,6 +64,7 @@ const CarsListing = () => {
     setPriceRange([0, 100000]);
     setYearRange([2018, 2024]);
     setSearchQuery("");
+    setCarType("all");
   };
 
   const filteredCars = useMemo(() => {

@@ -9,6 +9,8 @@ import CarsListing from "./pages/CarsListing";
 import CarDetails from "./pages/CarDetails";
 import NewsListing from "./pages/NewsListing";
 import NewsDetail from "./pages/NewsDetail";
+import CompareCars from "./pages/CompareCars";
+import EMICalculatorPage from "./pages/EMICalculatorPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/car/:id" element={<CarDetails />} />
           <Route path="/news" element={<NewsListing />} />
           <Route path="/news/:slug" element={<NewsDetail />} />
+          <Route path="/compare" element={<CompareCars />} />
+          <Route path="/emi-calculator" element={<EMICalculatorPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

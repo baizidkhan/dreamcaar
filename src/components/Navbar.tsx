@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 const navLinks = [
   { label: "Buy Cars", href: "/cars" },
   { label: "Sell Car", href: "/cars" },
-  { label: "Compare", href: "/#compare" },
-  { label: "EMI Calculator", href: "/#emi" },
-  { label: "News", href: "#" },
+  { label: "Compare", href: "/compare" },
+  { label: "EMI Calculator", href: "/emi-calculator" },
+  { label: "News", href: "/news" },
 ];
 
 export const Navbar = () => {
