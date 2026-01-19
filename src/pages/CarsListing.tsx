@@ -16,7 +16,6 @@ import { carsData, brands, bodyTypes, fuelTypes, transmissionTypes, locations } 
 
 const CarsListing = () => {
   const [searchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("featured");
@@ -27,8 +26,10 @@ const CarsListing = () => {
   const urlType = searchParams.get("type"); // "new" or "used"
   const urlMinPrice = searchParams.get("minPrice");
   const urlMaxPrice = searchParams.get("maxPrice");
+  const urlSearch = searchParams.get("search");
   
   // Filter states - initialize from URL params
+  const [searchQuery, setSearchQuery] = useState(urlSearch || "");
   const [selectedBrands, setSelectedBrands] = useState<string[]>(
     urlBrand ? [urlBrand] : []
   );
@@ -70,13 +71,18 @@ const CarsListing = () => {
   const filteredCars = useMemo(() => {
     let cars = [...carsData];
 
-    // Search filter
+    // Search filter - enhanced to search in more fields
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       cars = cars.filter(car => 
         car.name.toLowerCase().includes(query) ||
         car.brand.toLowerCase().includes(query) ||
-        car.model.toLowerCase().includes(query)
+        car.model.toLowerCase().includes(query) ||
+        car.bodyType.toLowerCase().includes(query) ||
+        car.fuel.toLowerCase().includes(query) ||
+        car.location.toLowerCase().includes(query) ||
+        car.color.toLowerCase().includes(query) ||
+        car.features.some(f => f.toLowerCase().includes(query))
       );
     }
 

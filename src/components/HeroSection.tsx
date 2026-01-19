@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Search, Car, DollarSign, ChevronDown, Sparkles, TrendingUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Car, DollarSign, ChevronDown, Sparkles, TrendingUp, MapPin, Fuel, Calendar, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import heroImage from "@/assets/hero-car.jpg";
+import { carsData } from "@/data/carsData";
 
 const budgetRanges = [
   { label: "Under $10,000", min: 0, max: 10000 },
@@ -27,8 +29,90 @@ export const HeroSection = () => {
   const [selectedBrand, setSelectedBrand] = useState("");
   const [showBudgetDropdown, setShowBudgetDropdown] = useState(false);
   const [showBrandDropdown, setShowBrandDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
-  const handleSearch = () => {
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Live search results
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    
+    const query = searchQuery.toLowerCase();
+    return carsData
+      .filter(car => 
+        car.name.toLowerCase().includes(query) ||
+        car.brand.toLowerCase().includes(query) ||
+        car.model.toLowerCase().includes(query) ||
+        car.bodyType.toLowerCase().includes(query) ||
+        car.fuel.toLowerCase().includes(query) ||
+        car.location.toLowerCase().includes(query) ||
+        car.features.some(f => f.toLowerCase().includes(query))
+      )
+      .slice(0, 6); // Limit to 6 results
+  }, [searchQuery]);
+
+  // Get search suggestions (brands, body types, features)
+  const suggestions = useMemo(() => {
+    if (!searchQuery.trim() || searchQuery.length < 2) return [];
+    
+    const query = searchQuery.toLowerCase();
+    const allSuggestions: { type: string; value: string; icon: string }[] = [];
+    
+    // Matching brands
+    brands.filter(b => b.toLowerCase().includes(query))
+      .forEach(b => allSuggestions.push({ type: "Brand", value: b, icon: "🏷️" }));
+    
+    // Matching body types
+    const bodyTypes = [...new Set(carsData.map(c => c.bodyType))];
+    bodyTypes.filter(bt => bt.toLowerCase().includes(query))
+      .forEach(bt => allSuggestions.push({ type: "Category", value: bt, icon: "🚗" }));
+    
+    // Matching locations
+    const locations = [...new Set(carsData.map(c => c.location.split(",")[0]))];
+    locations.filter(l => l.toLowerCase().includes(query))
+      .forEach(l => allSuggestions.push({ type: "Location", value: l, icon: "📍" }));
+    
+    return allSuggestions.slice(0, 4);
+  }, [searchQuery]);
+
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      navigate(`/cars?search=${encodeURIComponent(searchQuery)}`);
+    } else {
+      handleFilterSearch();
+    }
+    setShowSearchResults(false);
+  };
+
+  const handleCarClick = (carId: number) => {
+    navigate(`/car/${carId}`);
+    setShowSearchResults(false);
+  };
+
+  const handleSuggestionClick = (suggestion: { type: string; value: string }) => {
+    if (suggestion.type === "Brand") {
+      navigate(`/cars?brand=${encodeURIComponent(suggestion.value)}`);
+    } else if (suggestion.type === "Category") {
+      navigate(`/cars?bodyType=${encodeURIComponent(suggestion.value)}`);
+    } else if (suggestion.type === "Location") {
+      navigate(`/cars?search=${encodeURIComponent(suggestion.value)}`);
+    }
+    setShowSearchResults(false);
+    setSearchQuery("");
+  };
+
+  const handleFilterSearch = () => {
     const params = new URLSearchParams();
     
     // Add car type filter
@@ -136,6 +220,120 @@ export const HeroSection = () => {
               }
             </motion.p>
 
+            {/* Live Search Input */}
+            <div className="relative mb-4" ref={searchRef}>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search cars, brands, features, locations..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSearchResults(true);
+                  }}
+                  onFocus={() => setShowSearchResults(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchSubmit();
+                    }
+                  }}
+                  className="w-full pl-12 pr-10 py-3 h-auto rounded-xl bg-secondary border-border focus:border-primary/50"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setShowSearchResults(false);
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Search Results Dropdown */}
+              <AnimatePresence>
+                {showSearchResults && (searchResults.length > 0 || suggestions.length > 0) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-card-hover overflow-hidden z-30 max-h-[400px] overflow-y-auto"
+                  >
+                    {/* Suggestions */}
+                    {suggestions.length > 0 && (
+                      <div className="p-2 border-b border-border">
+                        <p className="px-3 py-1 text-xs font-medium text-muted-foreground uppercase">Suggestions</p>
+                        {suggestions.map((suggestion, idx) => (
+                          <button
+                            key={`${suggestion.type}-${suggestion.value}-${idx}`}
+                            onClick={() => handleSuggestionClick(suggestion)}
+                            className="w-full flex items-center gap-3 px-3 py-2 hover:bg-primary/10 rounded-lg transition-colors"
+                          >
+                            <span className="text-lg">{suggestion.icon}</span>
+                            <div className="text-left">
+                              <p className="font-medium text-foreground">{suggestion.value}</p>
+                              <p className="text-xs text-muted-foreground">{suggestion.type}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Car Results */}
+                    {searchResults.length > 0 && (
+                      <div className="p-2">
+                        <p className="px-3 py-1 text-xs font-medium text-muted-foreground uppercase">Cars</p>
+                        {searchResults.map((car) => (
+                          <button
+                            key={car.id}
+                            onClick={() => handleCarClick(car.id)}
+                            className="w-full flex items-center gap-3 px-3 py-2 hover:bg-primary/10 rounded-lg transition-colors"
+                          >
+                            <img
+                              src={car.image}
+                              alt={car.name}
+                              className="w-16 h-12 object-cover rounded-lg"
+                            />
+                            <div className="flex-1 text-left">
+                              <p className="font-medium text-foreground line-clamp-1">{car.name}</p>
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {car.year}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Fuel className="w-3 h-3" />
+                                  {car.fuel}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="w-3 h-3" />
+                                  {car.location.split(",")[0]}
+                                </span>
+                              </div>
+                            </div>
+                            <p className="font-bold text-primary">${car.price.toLocaleString()}</p>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* View All Results */}
+                    {searchQuery.trim() && (
+                      <button
+                        onClick={handleSearchSubmit}
+                        className="w-full p-3 text-center text-primary font-medium hover:bg-primary/10 border-t border-border transition-colors"
+                      >
+                        View all results for "{searchQuery}"
+                      </button>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {/* Search Filters */}
             <div className="grid md:grid-cols-3 gap-4">
               {/* Budget Dropdown */}
@@ -224,7 +422,7 @@ export const HeroSection = () => {
 
               {/* Search Button */}
               <Button 
-                onClick={handleSearch}
+                onClick={handleFilterSearch}
                 className="h-auto py-3 px-6 rounded-xl font-semibold text-base gap-2"
               >
                 <Search className="w-5 h-5" />
