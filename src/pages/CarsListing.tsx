@@ -13,8 +13,10 @@ import { Slider } from "@/components/ui/slider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { carsData, brands, bodyTypes, fuelTypes, transmissionTypes, locations } from "@/data/carsData";
+import { useCarContext } from "@/context/CarContext";
 
 const CarsListing = () => {
+  const { userCars } = useCarContext();
   const [searchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -69,7 +71,7 @@ const CarsListing = () => {
   };
 
   const filteredCars = useMemo(() => {
-    let cars = [...carsData];
+    let cars = [...userCars, ...carsData];
 
     // Search filter - enhanced to search in more fields
     if (searchQuery) {
@@ -134,7 +136,7 @@ const CarsListing = () => {
     }
 
     return cars;
-  }, [searchQuery, selectedBrands, selectedBodyTypes, selectedFuelTypes, selectedTransmission, selectedLocations, priceRange, yearRange, sortBy]);
+  }, [searchQuery, selectedBrands, selectedBodyTypes, selectedFuelTypes, selectedTransmission, selectedLocations, priceRange, yearRange, sortBy, userCars]);
 
   const activeFiltersCount = selectedBrands.length + selectedBodyTypes.length + selectedFuelTypes.length + selectedTransmission.length + selectedLocations.length;
 
