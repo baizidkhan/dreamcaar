@@ -57,7 +57,7 @@ export const Navbar = () => {
             <User className="w-4 h-4" />
             Login
           </Button>
-          <Link to="/cars">
+          <Link to="/post-car">
             <Button size="sm">Post Your Car</Button>
           </Link>
         </div>
@@ -95,7 +95,7 @@ export const Navbar = () => {
                 <User className="w-4 h-4" />
                 Login
               </Button>
-              <Link to="/cars" onClick={() => setIsOpen(false)}>
+              <Link to="/post-car" onClick={() => setIsOpen(false)}>
                 <Button className="w-full">Post Your Car</Button>
               </Link>
             </div>
