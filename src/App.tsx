@@ -13,6 +13,7 @@ import NewsDetail from "./pages/NewsDetail";
 import CompareCars from "./pages/CompareCars";
 import EMICalculatorPage from "./pages/EMICalculatorPage";
 import PostCar from "./pages/PostCar";
+import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/compare" element={<CompareCars />} />
             <Route path="/emi-calculator" element={<EMICalculatorPage />} />
             <Route path="/post-car" element={<PostCar />} />
+            <Route path="/contact" element={<ContactUs />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
